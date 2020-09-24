@@ -26,6 +26,12 @@
   [req]
   (:AudioPlayer (:context (parse-string req true))))
 
+(defn get-system-object
+  "HASHMAP: A system object that provides information about the current state 
+   of the Alexa service and the device interacting with your skill."
+  [req]
+  (:System (:context (parse-string req true))))
+
 (defn get-viewport
   "Returns the viewport object from the context."
   [req]

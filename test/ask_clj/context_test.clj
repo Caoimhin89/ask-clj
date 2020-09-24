@@ -28,6 +28,24 @@
     (let [aplDoc (ctx/get-apl-doc audio-req)]
       (is (= aplDoc nil)))))
 
+(deftest get-system-object
+  (testing "Get System object from context."
+    (let [system (ctx/get-system-object audio-req)]
+      (println "SYSTEM")
+      (println system)
+    (is (= system {:device {:deviceId "string", 
+                            :supportedInterfaces {:AudioPlayer {}}}, 
+                   :application {:applicationId "amzn1.ask.skill.[unique-value-here]"}, 
+                   :user {:userId "amzn1.ask.account.[unique-value-here]", 
+                          :accessToken "Atza|AAAAAAAA...", 
+                          :permissions {:consentToken "ZZZZZZZ..."}}, 
+                   :person {:personId "amzn1.ask.person.[unique-value-here]", 
+                            :accessToken "Atza|BBBBBBB..."}, 
+                   :unit {:unitId "amzn1.ask.unit.[unique-value-here]", 
+                          :persistentUnitId "amzn1.alexa.unit.did.[unique-value-here]"}, 
+                   :apiEndpoint "https://api.amazonalexa.com", 
+                   :apiAccessToken "AxThk;afjaofjaojflajfEJGALJ"})))))
+
 (deftest get-audio-player
   (testing "Get the AudioPlayer object from context."
     (let [audio-player (ctx/get-audio-player audio-req)]
