@@ -2,7 +2,7 @@
   (:require [cheshire.core :refer :all]))
 
 ; AUDIO PLAYER METHODS
-(defn get-audioplayer-token
+(defn get-token
   "String: An opaque token that represents the audio stream described 
    by this AudioPlayer object. You provide this token when sending the 
    Play directive. This is only included in the AudioPlayer object when 

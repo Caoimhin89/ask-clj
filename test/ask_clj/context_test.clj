@@ -31,8 +31,6 @@
 (deftest get-system-object
   (testing "Get System object from context."
     (let [system (ctx/get-system-object audio-req)]
-      (println "SYSTEM")
-      (println system)
     (is (= system {:device {:deviceId "string", 
                             :supportedInterfaces {:AudioPlayer {}}}, 
                    :application {:applicationId "amzn1.ask.skill.[unique-value-here]"}, 

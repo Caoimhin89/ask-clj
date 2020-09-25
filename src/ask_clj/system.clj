@@ -26,7 +26,28 @@
   (:device sys))
 
 (defn get-unit 
-  "An object that represents a logical construct organizing actors (such as people and organizations) 
+  "HASHMAP: represents a logical construct organizing actors (such as people and organizations) 
    and resources (such as devices and skills) that interact with Alexa systems."
   [sys]
   (:unit sys))
+
+(defn get-person
+  "HASHMAP: describes the person who is making the request to Alexa. 
+   The person object is different than the user object, because person refers to a 
+   user whom Alexa recognizes by voice, whereas user refers to the Amazon account 
+   for which the skill is enabled. Consists of:
+   - personId
+   - accessToken (will not appear if null)."
+  [sys]
+  (:person sys))
+
+(defn get-user
+  "HASHMAP: describes the Amazon account for which the skill is enabled. 
+   The user object is different than the person object, because user refers to 
+   the Amazon account for which the skill is enabled, whereas person refers to 
+   a user whom Alexa recognizes by voice. A user is composed of: 
+   - userId
+   - accessToken
+   - permissions -> consentToken, apiAccessToken"
+  [sys]
+  (:user sys))
