@@ -2,14 +2,25 @@
   (:require [cheshire.core :refer :all]
             [clojure.spec.alpha :as s]))
 
+(defn set-session-end
+  "Sets shouldSessionEnd boolean."
+  [res x]
+  (swap! update res :response assoc :shouldSessionEnd x))
+
 (defn set-session-attribute
   "Set session attribute."
   [res k v]
   (swap! res update-in [:sessionAttributes] assoc (keyword k) v))
 
+(defn set-session-end
+  "Sets shouldSessionEnd boolean."
+  [res x]
+  (swap! res update :response assoc :shouldSessionEnd x))
+
 (defn set-speech-txt
   "Sets the output speech as plain text."
-  [res, txt]
+  [res txt end?]
+  (set-session-end res end?)
   (swap! res update-in [:response :outputSpeech] assoc 
          :text txt 
          :type "PlainText"
@@ -17,7 +28,8 @@
 
 (defn set-speech-ssml
   "Sets the output speech as SSML."
-  [res, saml]
+  [res saml end?]
+  (set-session-end res end?)
   (swap! res update-in [:response :outputSpeech] assoc
          :ssml saml
          :type "SSML"
@@ -25,7 +37,8 @@
 
 (defn set-reprompt-txt
   "Sets the reprompt speech as plain text."
-  [res txt]
+  [res txt end?]
+  (set-session-end res end?)
   (swap! res update-in [:response :reprompt :outputSpeech] assoc
          :text txt
          :type "PlainText"
@@ -33,7 +46,8 @@
 
 (defn set-reprompt-ssml
   "Sets the reprompt speech as ssml."
-  [res ssml]
+  [res ssml end?]
+  (set-session-end res end?)
   (swap! res update-in [:response :reprompt :outputSpeech] assoc
          :ssml ssml
          :type "SSML"
@@ -60,3 +74,9 @@
            :text text
            :image {:smallImageUrl sm
                    :largeImageUrl lg})))
+
+(defn set-link-account-card
+  "A card that displays a link to an authorization URI that the user can use to 
+   link their Alexa account with a user in another system."
+  [res]
+  (swap! res update-in [:response :card] assoc :type "LinkAccount"))

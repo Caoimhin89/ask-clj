@@ -11,40 +11,48 @@
     (let [response (atom {})]
       (r/set-session-attribute response "key" "value")
       (r/set-session-attribute response "foo" "bar")
+      (r/set-session-attribute response "obj" {:foo "bar"
+                                               :baz "buz"})
       (is (= @response {:sessionAttributes {:key "value"
-                                            :foo "bar"}})))))
+                                            :foo "bar"
+                                            :obj {:foo "bar"
+                                                  :baz "buz"}}})))))
 
 (deftest set-speech-txt
   (testing "Set speech text."
     (let [response (atom {})]
-      (r/set-speech-txt response "Hi there")
-      (is (= (:outputSpeech (:response @response)) {:type "PlainText"
-                                                    :text "Hi there"
-                                                    :playBehavior "ENQUEUE"})))))
+      (r/set-speech-txt response "Hi there" true)
+      (is (= (:response @response) {:outputSpeech {:type "PlainText"
+                                                   :text "Hi there"
+                                                   :playBehavior "ENQUEUE"}
+                                    :shouldSessionEnd true})))))
 
 (deftest set-speech-ssml
   (testing "Set speech text."
     (let [response (atom {})]
-      (r/set-speech-ssml response "<speak>Hi there</speak>")
-      (is (= (:outputSpeech (:response @response)) {:type "SSML"
-                                                    :ssml "<speak>Hi there</speak>"
-                                                    :playBehavior "ENQUEUE"})))))
+      (r/set-speech-ssml response "<speak>Hi there</speak>" false)
+      (is (= (:response @response) {:outputSpeech {:type "SSML"
+                                                   :ssml "<speak>Hi there</speak>"
+                                                   :playBehavior "ENQUEUE"}
+                                    :shouldSessionEnd false})))))
 
 (deftest set-reprompt-txt
   (testing "Set reprompt text as plain text."
     (let [response (atom {})]
-      (r/set-reprompt-txt response "Would you like to play again?")
+      (r/set-reprompt-txt response "Would you like to play again?" false)
       (is (= (:response @response) {:reprompt {:outputSpeech {:text "Would you like to play again?"
                                                               :type "PlainText"
-                                                              :playBehavior "ENQUEUE"}}})))))
+                                                              :playBehavior "ENQUEUE"}}
+                                    :shouldSessionEnd false})))))
 
 (deftest set-reprompt-ssml
   (testing "Set reprompt text as ssml."
     (let [response (atom {})]
-      (r/set-reprompt-ssml response "<speak>Would you like to play again?</speak>")
+      (r/set-reprompt-ssml response "<speak>Would you like to play again?</speak>" false)
       (is (= (:response @response) {:reprompt {:outputSpeech {:ssml "<speak>Would you like to play again?</speak>"
                                                               :type "SSML"
-                                                              :playBehavior "ENQUEUE"}}})))))
+                                                              :playBehavior "ENQUEUE"}}
+                                    :shouldSessionEnd false})))))
 
 (deftest set-simple-card
   (testing "Set simple card."
@@ -71,3 +79,21 @@
       (is (= (:response @response) {:card {:type "Standard"
                                            :title "My Title"
                                            :text "Here is some text."}})))))
+
+(deftest set-session-end-true
+  (testing "Set shouldSessionEnd to true."
+    (let [response (atom {})]
+      (r/set-session-end response true)
+      (is (= (:response @response) {:shouldSessionEnd true})))))
+
+(deftest set-session-end-false
+  (testing "Set shouldSessionEnd to false."
+    (let [response (atom {})]
+      (r/set-session-end response false)
+      (is (= (:response @response) {:shouldSessionEnd false})))))
+
+(deftest set-link-account-card
+  (testing "Set a Link Account card."
+    (let [response (atom {})]
+      (r/set-link-account-card response)
+      (is (= (:response @response) {:card {:type "LinkAccount"}})))))
