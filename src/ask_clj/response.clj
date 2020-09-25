@@ -2,6 +2,11 @@
   (:require [cheshire.core :refer :all]
             [clojure.spec.alpha :as s]))
 
+(defn set-session-attribute
+  "Set session attribute."
+  [res k v]
+  (swap! res update-in [:sessionAttributes] assoc (keyword k) v))
+
 (defn set-speech-txt
   "Sets the output speech as plain text."
   [res, txt]
@@ -26,6 +31,32 @@
          :type "PlainText"
          :playBehavior "ENQUEUE"))
 
+(defn set-reprompt-ssml
+  "Sets the reprompt speech as ssml."
+  [res ssml]
+  (swap! res update-in [:response :reprompt :outputSpeech] assoc
+         :ssml ssml
+         :type "SSML"
+         :playBehavior "ENQUEUE"))
+
 (defn set-simple-card
   [res title content]
-  (swap! res update-in [:response :card] assoc :title title :content content))
+  (swap! res update-in [:response :card] assoc 
+         :type "Simple"
+         :title title 
+         :content content))
+
+(defn set-standard-card
+  "Set a standard card."
+  ([res title text]
+   (swap! res update-in [:response :card] assoc 
+           :type "Standard"
+           :title title
+           :text text))
+  ([res title text sm lg]
+    (swap! res update-in [:response :card] assoc
+           :type "Standard"
+           :title title
+           :text text
+           :image {:smallImageUrl sm
+                   :largeImageUrl lg})))

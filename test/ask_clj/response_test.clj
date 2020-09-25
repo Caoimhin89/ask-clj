@@ -6,6 +6,14 @@
 (def audio-req "{ \"version\": \"1.0\", \"session\": { \"new\": true, \"sessionId\": \"amzn1.echo-api.session.[unique-value-here]\", \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"attributes\": { \"key\": \"string value\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } } }, \"context\": { \"System\": { \"device\": { \"deviceId\": \"string\", \"supportedInterfaces\": { \"AudioPlayer\": {} } }, \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } }, \"person\": { \"personId\": \"amzn1.ask.person.[unique-value-here]\", \"accessToken\": \"Atza|BBBBBBB...\" }, \"unit\": { \"unitId\": \"amzn1.ask.unit.[unique-value-here]\", \"persistentUnitId\" : \"amzn1.alexa.unit.did.[unique-value-here]\" }, \"apiEndpoint\": \"https://api.amazonalexa.com\", \"apiAccessToken\": \"AxThk;afjaofjaojflajfEJGALJ\" }, \"AudioPlayer\": { \"playerActivity\": \"PLAYING\", \"token\": \"audioplayer-token\", \"offsetInMilliseconds\": 0 } }, \"request\": {} }")
 (def video-req "")
 
+(deftest set-session-attribute
+  (testing "Set session attribute."
+    (let [response (atom {})]
+      (r/set-session-attribute response "key" "value")
+      (r/set-session-attribute response "foo" "bar")
+      (is (= @response {:sessionAttributes {:key "value"
+                                            :foo "bar"}})))))
+
 (deftest set-speech-txt
   (testing "Set speech text."
     (let [response (atom {})]
@@ -30,9 +38,36 @@
                                                               :type "PlainText"
                                                               :playBehavior "ENQUEUE"}}})))))
 
+(deftest set-reprompt-ssml
+  (testing "Set reprompt text as ssml."
+    (let [response (atom {})]
+      (r/set-reprompt-ssml response "<speak>Would you like to play again?</speak>")
+      (is (= (:response @response) {:reprompt {:outputSpeech {:ssml "<speak>Would you like to play again?</speak>"
+                                                              :type "SSML"
+                                                              :playBehavior "ENQUEUE"}}})))))
+
 (deftest set-simple-card
   (testing "Set simple card."
     (let [response (atom {})]
       (r/set-simple-card response "My Title" "Here is some text.")
-      (is (= (:response @response) {:card {:title "My Title"
-                                          :content "Here is some text."}})))))
+      (is (= (:response @response) {:card {:type "Simple"
+                                           :title "My Title"
+                                           :content "Here is some text."}})))))
+
+(deftest set-standard-card-with-photos
+  (testing "Set standard card with photos."
+    (let [response (atom {})]
+      (r/set-standard-card response "My Title" "Here is some text." "https://small-image.jpg" "https://big-image.jpg")
+      (is (= (:response @response) {:card {:type "Standard"
+                                           :title "My Title"
+                                           :text "Here is some text."
+                                           :image {:smallImageUrl "https://small-image.jpg"
+                                                   :largeImageUrl "https://big-image.jpg"}}})))))
+
+(deftest set-standard-card-no-photos
+  (testing "Set standard card without photos."
+    (let [response (atom {})]
+      (r/set-standard-card response "My Title" "Here is some text.")
+      (is (= (:response @response) {:card {:type "Standard"
+                                           :title "My Title"
+                                           :text "Here is some text."}})))))
