@@ -1,10 +1,17 @@
 (ns ask-clj.response-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.pprint :as p]
+            [clojure.test :refer :all]
             [ask-clj.response :as r]))
 
 (def basic-req "")
 (def audio-req "{ \"version\": \"1.0\", \"session\": { \"new\": true, \"sessionId\": \"amzn1.echo-api.session.[unique-value-here]\", \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"attributes\": { \"key\": \"string value\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } } }, \"context\": { \"System\": { \"device\": { \"deviceId\": \"string\", \"supportedInterfaces\": { \"AudioPlayer\": {} } }, \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } }, \"person\": { \"personId\": \"amzn1.ask.person.[unique-value-here]\", \"accessToken\": \"Atza|BBBBBBB...\" }, \"unit\": { \"unitId\": \"amzn1.ask.unit.[unique-value-here]\", \"persistentUnitId\" : \"amzn1.alexa.unit.did.[unique-value-here]\" }, \"apiEndpoint\": \"https://api.amazonalexa.com\", \"apiAccessToken\": \"AxThk;afjaofjaojflajfEJGALJ\" }, \"AudioPlayer\": { \"playerActivity\": \"PLAYING\", \"token\": \"audioplayer-token\", \"offsetInMilliseconds\": 0 } }, \"request\": {} }")
 (def video-req "")
+
+(deftest set-app-version
+  (testing "Set application version."
+    (let [response (atom {})]
+      (r/set-app-version response "1.0")
+      (is (= @response {:version "1.0"})))))
 
 (deftest set-session-attribute
   (testing "Set session attribute."
@@ -97,3 +104,31 @@
     (let [response (atom {})]
       (r/set-link-account-card response)
       (is (= (:response @response) {:card {:type "LinkAccount"}})))))
+
+(deftest gen-display-template-text-content
+  (testing "Generate textContent object for display templates."
+    (let [textContent (r/gen-display-template-text "PRIMUS" "Secundus" "insignificante!")]
+      (is (= textContent {:primaryText {:text "PRIMUS"
+                                        :type "PlainText"}
+                          :secondaryText {:text "Secundus"
+                                          :type "PlainText"}
+                          :tertiaryText {:text "insignificante!"
+                                         :type "PlainText"}})))))
+
+(deftest set-display-body-template-1-no-prior-directives
+  (testing "Set Display BodyTemplate1 no with prior directives."
+    (let[response (atom  {})]
+     (r/set-display-body-template-1 response 
+                                    "token" 
+                                    "https://background-image.jpg"
+                                    "My Title"
+                                    "lorem ipsum dolar sit amet...")
+      (p/pprint @response)
+      (is (= @response {:response {:directives (vector
+                                                {:type "Display.RenderTemplate"
+                                                 :template {:type "BodyTemplate1"
+                                                            :token "token"
+                                                            :backgroundImage "https://background-image.jpg"
+                                                            :title "My Title"
+                                                            :textContent "lorem ipsum dolar sit amet..."
+                                                            :backButton "HIDDEN"}})}})))))

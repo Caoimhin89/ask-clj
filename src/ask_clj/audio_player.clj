@@ -11,7 +11,7 @@
   (:token ap))
 
 (defn get-offset-in-milliseconds
-  "Identifies a track's offset in milliseconds at the time the request
+  "INT: Identifies a track's offset in milliseconds at the time the request
    was sent. This is 0 if the track is at the beginning. This is only 
    included in the AudioPlayer object when your skill was the skill most 
    recently playing audio on the device."

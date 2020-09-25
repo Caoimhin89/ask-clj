@@ -2,10 +2,15 @@
   (:require [cheshire.core :refer :all]
             [clojure.spec.alpha :as s]))
 
+(defn set-app-version
+  "Sets version property in response."
+  [res v]
+  (swap! res assoc :version v))
+
 (defn set-session-end
   "Sets shouldSessionEnd boolean."
   [res x]
-  (swap! update res :response assoc :shouldSessionEnd x))
+  (swap! res update :response assoc :shouldSessionEnd x))
 
 (defn set-session-attribute
   "Set session attribute."
@@ -80,3 +85,46 @@
    link their Alexa account with a user in another system."
   [res]
   (swap! res update-in [:response :card] assoc :type "LinkAccount"))
+
+(defn gen-display-template-text
+  "HASHMAP: Generates the textContent for a display template."
+  ([primary secondary tertiary]
+   {:primaryText {:text primary
+                  :type "PlainText"}
+    :secondaryText {:text secondary
+                    :type "PlainText"}
+    :tertiaryText {:text tertiary
+                   :type "PlainText"}})
+  ([primary secondary]
+   {:primaryText {:text primary
+                  :type "PlainText"}
+    :secondaryText {:text secondary
+                    :type "PlainText"}})
+  ([primary]
+   {:primaryText {:text primary
+                  :type "PlainText"}}))
+
+(defn set-display-body-template-1
+  "Adds a display body template to the response."
+  ([res token bgImg title txt]
+  (let [template {:type "Display.RenderTemplate"
+                  :template {:type "BodyTemplate1"
+                             :token token
+                             :backgroundImage bgImg
+                             :title title
+                             :textContent txt
+                             :backButton "HIDDEN"}}]
+    (if (some? (:directives (:response @res)))
+      (swap! res update-in [:response :directives] merge template)
+      (swap! res assoc-in [:response :directives] (vector template)))))
+  ([res token bgImg title txt btnVisability]
+   (let [template {:type "Display.RenderTemplate"
+                   :template {:type "BodyTemplate1"
+                              :token token
+                              :backgroundImage bgImg
+                              :title title
+                              :textContent txt
+                              :backButton btnVisability}}]
+     (if (some? (:directives (:response @res)))
+       (swap! res update-in [:response :directives] merge template)
+       (swap! res assoc-in [:response :directives] (vector template))))))
