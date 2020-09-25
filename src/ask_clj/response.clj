@@ -17,3 +17,15 @@
          :ssml saml
          :type "SSML"
          :playBehavior "ENQUEUE"))
+
+(defn set-reprompt-txt
+  "Sets the reprompt speech as plain text."
+  [res txt]
+  (swap! res update-in [:response :reprompt :outputSpeech] assoc
+         :text txt
+         :type "PlainText"
+         :playBehavior "ENQUEUE"))
+
+(defn set-simple-card
+  [res title content]
+  (swap! res update-in [:response :card] assoc :title title :content content))

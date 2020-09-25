@@ -21,3 +21,18 @@
       (is (= (:outputSpeech (:response @response)) {:type "SSML"
                                                     :ssml "<speak>Hi there</speak>"
                                                     :playBehavior "ENQUEUE"})))))
+
+(deftest set-reprompt-txt
+  (testing "Set reprompt text as plain text."
+    (let [response (atom {})]
+      (r/set-reprompt-txt response "Would you like to play again?")
+      (is (= (:response @response) {:reprompt {:outputSpeech {:text "Would you like to play again?"
+                                                              :type "PlainText"
+                                                              :playBehavior "ENQUEUE"}}})))))
+
+(deftest set-simple-card
+  (testing "Set simple card."
+    (let [response (atom {})]
+      (r/set-simple-card response "My Title" "Here is some text.")
+      (is (= (:response @response) {:card {:title "My Title"
+                                          :content "Here is some text."}})))))
