@@ -85,3 +85,21 @@
    link their Alexa account with a user in another system."
   [res]
   (swap! res update-in [:response :card] assoc :type "LinkAccount"))
+
+(defn set-permissions-card
+  "A card that asks the customer for consent to obtain specific customer 
+   information, such as Alexa lists or address information.
+   Args:
+   - response: atom
+   - permissions: vector of Permission strings"
+  [res perms]
+  (swap! res update-in [:response :card] assoc 
+         :type "AskForPermissionsConsent"
+         :permissions perms))
+
+(defn set-display-template
+  "Adds a displayTemplate to the response."
+  [res temp]
+  (if (some? (:directives (:response @res)))
+    (swap! res update-in [:response :directives] merge temp)
+    (swap! res assoc-in [:response :directives] (vector temp))))

@@ -1,7 +1,8 @@
 (ns ask-clj.response-test
   (:require [clojure.pprint :as p]
             [clojure.test :refer :all]
-            [ask-clj.response :as r]))
+            [ask-clj.response :as r]
+            [ask-clj.display :as d]))
 
 (def basic-req "")
 (def audio-req "{ \"version\": \"1.0\", \"session\": { \"new\": true, \"sessionId\": \"amzn1.echo-api.session.[unique-value-here]\", \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"attributes\": { \"key\": \"string value\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } } }, \"context\": { \"System\": { \"device\": { \"deviceId\": \"string\", \"supportedInterfaces\": { \"AudioPlayer\": {} } }, \"application\": { \"applicationId\": \"amzn1.ask.skill.[unique-value-here]\" }, \"user\": { \"userId\": \"amzn1.ask.account.[unique-value-here]\", \"accessToken\": \"Atza|AAAAAAAA...\", \"permissions\": { \"consentToken\": \"ZZZZZZZ...\" } }, \"person\": { \"personId\": \"amzn1.ask.person.[unique-value-here]\", \"accessToken\": \"Atza|BBBBBBB...\" }, \"unit\": { \"unitId\": \"amzn1.ask.unit.[unique-value-here]\", \"persistentUnitId\" : \"amzn1.alexa.unit.did.[unique-value-here]\" }, \"apiEndpoint\": \"https://api.amazonalexa.com\", \"apiAccessToken\": \"AxThk;afjaofjaojflajfEJGALJ\" }, \"AudioPlayer\": { \"playerActivity\": \"PLAYING\", \"token\": \"audioplayer-token\", \"offsetInMilliseconds\": 0 } }, \"request\": {} }")
@@ -104,3 +105,20 @@
     (let [response (atom {})]
       (r/set-link-account-card response)
       (is (= (:response @response) {:card {:type "LinkAccount"}})))))
+
+(deftest set-display-template
+  (testing "Set display template in response."
+    (let [temp (d/gen-display-body-template-1 
+                "myToken" 
+                (d/gen-display-template-image
+                 "My description..."
+                 (vector (d/gen-image-source "https://my-image.jpg" "s" 720 480)
+                         (d/gen-image-source "https://my-image2.jpg" "m" 960 640)
+                         (d/gen-image-source "https://image.jpg" "l")))
+                "My Title"
+                (d/gen-display-template-text "PRIMUS!" "Secundus!" "tertiary!"))
+          response (atom {})]
+      (r/set-display-template response temp)
+      (p/pprint @response)
+      (p/pprint {:response {:directives (vector temp)}})
+      (is (= @response {:response {:directives (vector temp)}})))))
