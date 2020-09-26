@@ -5,9 +5,3 @@
             [ask-clj.system :as sys]
             [ask-clj.audio-player :as audio-player]
             [cheshire.core :refer :all]))
-
-(def response (atom {}))
-
-(defn get-intent
-  [req]
-  (:type (:request (parse-string req true))))
