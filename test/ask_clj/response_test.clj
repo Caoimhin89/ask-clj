@@ -119,6 +119,4 @@
                 (d/gen-display-template-text "PRIMUS!" "Secundus!" "tertiary!"))
           response (atom {})]
       (r/set-display-template response temp)
-      (p/pprint @response)
-      (p/pprint {:response {:directives (vector temp)}})
       (is (= @response {:response {:directives (vector temp)}})))))

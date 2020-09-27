@@ -140,7 +140,7 @@
                               :backButton btnVisability}}))
 
 (defn gen-display-body-template-7
-  "HASHMAP: Adds display BodyTemplate7 to the response."
+  "HASHMAP: Creates a display BodyTemplate7."
   ([token bgImg img bgTxt imgTxt]
    {:type "Display.RenderTemplate"
                    :template {:type "BodyTemplate7"
@@ -161,3 +161,24 @@
   {:token token
    :image img
    :textContent txt})
+
+(defn gen-display-list-template-1
+  "HASHMAP: Creates a display ListTemplate1."
+  ([token bgImg title items btnVisability]
+   {:type "Display.RenderTemplate"
+    :template {:type "ListTemplate1"
+               :token  token
+               :backButton (if btnVisability
+                             "VISIBLE"
+                             "HIDDEN")
+               :backgroundImage bgImg
+               :title  title
+               :listItems items}})
+  ([token bgImg title items]
+   {:type "Display.RenderTemplate"
+    :template {:type "ListTemplate1"
+               :token  token
+               :backButton "VISIBLE"
+               :backgroundImage bgImg
+               :title title
+               :listItems items}}))
